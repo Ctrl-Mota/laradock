@@ -56,6 +56,7 @@ RUN set -xe; \
     usermod -p "*" laradock -s /bin/bash && \
     apt-get install -yqq \
       apt-utils \
+      
       #
       #--------------------------------------------------------------------------
       # Mandatory Software's Installation
@@ -72,7 +73,7 @@ RUN set -xe; \
       php${LARADOCK_PHP_VERSION}-zip \
       # nasm
       nasm && \
-      php -m | grep -q 'zip'
+      php -m | grep -q 'zip' 
 
 #
 #--------------------------------------------------------------------------
@@ -262,6 +263,7 @@ RUN set -eux; \
     if [ ${INSTALL_BZ2} = true ]; then \
       apt-get -yqq install php${LARADOCK_PHP_VERSION}-bz2; \
     fi; \
+    
     ###########################################################################
     # GMP (GNU Multiple Precision):
     ###########################################################################
@@ -397,6 +399,19 @@ RUN if [ ${INSTALL_PCOV} = true ]; then \
   ;fi \
 ;fi
 
+###########################################################################
+# PHP GRPC EXTENSION
+###########################################################################
+
+ARG INSTALL_PHPGRPC=false
+
+RUN if [ ${INSTALL_PHPGRPC} = true ]; then \
+    apt-get install zlib1g-dev && \
+    pecl install grpc && \
+    echo "extension=grpc.so" >> /etc/php/${LARADOCK_PHP_VERSION}/mods-available/grpc.ini && \
+    ln -s /etc/php/${LARADOCK_PHP_VERSION}/mods-available/grpc.ini /etc/php/${LARADOCK_PHP_VERSION}/cli/conf.d/20-grpc.ini \
+    && php -m | grep -q 'grpc' \
+;fi
 
 ###########################################################################
 # Phpdbg:
